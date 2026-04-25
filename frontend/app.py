@@ -12,384 +12,14 @@ SESSION_DURATION_MINUTES = 15
 SESSION_FILE = "/tmp/rag_session.json"
 
 st.set_page_config(
-    page_title="RAG AI Assistant",
+    page_title="Document AI Analyst",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ==========================================
-# Premium CSS Injection
-# ==========================================
-st.markdown("""
-<style>
-/* ===== Google Font ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* ===== Global Overrides ===== */
-html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif !important;
-}
-
-/* ===== Hide Streamlit Branding ===== */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-
-/* ===== Custom Scrollbar ===== */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #0f172a;
-}
-::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #475569;
-}
-
-/* ===== Sidebar Styling ===== */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-    border-right: 1px solid #334155 !important;
-}
-
-[data-testid="stSidebar"] [data-testid="stMarkdown"] h1,
-[data-testid="stSidebar"] [data-testid="stMarkdown"] h2,
-[data-testid="stSidebar"] [data-testid="stMarkdown"] h3 {
-    color: #f8fafc !important;
-    font-weight: 600 !important;
-}
-
-/* ===== Button Styling ===== */
-.stButton > button {
-    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 0.5rem 1.2rem !important;
-    font-weight: 500 !important;
-    font-size: 0.9rem !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 15px rgba(129, 140, 248, 0.25) !important;
-}
-
-.stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(129, 140, 248, 0.4) !important;
-}
-
-.stButton > button:active {
-    transform: translateY(0) !important;
-}
-
-/* ===== Text Input Styling ===== */
-.stTextInput > div > div > input {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 10px !important;
-    color: #f8fafc !important;
-    padding: 0.6rem 1rem !important;
-    transition: all 0.3s ease !important;
-}
-
-.stTextInput > div > div > input:focus {
-    border-color: #818cf8 !important;
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15) !important;
-}
-
-/* ===== Chat Input Styling ===== */
-[data-testid="stChatInput"] {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 12px !important;
-    padding: 4px !important;
-}
-
-[data-testid="stChatInput"]:focus-within {
-    border-color: #818cf8 !important;
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15) !important;
-}
-
-[data-testid="stChatInput"] textarea {
-    background-color: transparent !important;
-    border: none !important;
-    color: #f8fafc !important;
-}
-
-/* ===== Chat Message Styling ===== */
-[data-testid="stChatMessage"] {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 16px !important;
-    padding: 1rem 1.2rem !important;
-    margin-bottom: 1rem !important;
-    backdrop-filter: blur(10px) !important;
-    animation: fadeInUp 0.3s ease-out;
-}
-
-/* ===== Select Box ===== */
-.stSelectbox > div > div {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 10px !important;
-}
-
-/* ===== Expander Styling ===== */
-.streamlit-expanderHeader {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 10px !important;
-    color: #94a3b8 !important;
-    font-weight: 500 !important;
-}
-
-/* ===== File Uploader ===== */
-[data-testid="stFileUploader"] {
-    background-color: #1e293b !important;
-    border: 1px dashed #334155 !important;
-    border-radius: 12px !important;
-    padding: 1rem !important;
-}
-
-[data-testid="stFileUploader"]:hover {
-    border-color: #818cf8 !important;
-}
-
-/* ===== Tabs Styling ===== */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 8px;
-    background-color: transparent !important;
-}
-
-.stTabs [data-baseweb="tab"] {
-    background-color: #1e293b !important;
-    border-radius: 10px !important;
-    border: 1px solid #334155 !important;
-    color: #94a3b8 !important;
-    padding: 0.5rem 1.5rem !important;
-    font-weight: 500 !important;
-}
-
-.stTabs [aria-selected="true"] {
-    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%) !important;
-    border: none !important;
-    color: white !important;
-}
-
-/* ===== Divider ===== */
-[data-testid="stHorizontalBlock"] hr {
-    border-color: #334155 !important;
-}
-
-/* ===== Success/Error Alerts ===== */
-.stSuccess {
-    background-color: rgba(52, 211, 153, 0.1) !important;
-    border: 1px solid rgba(52, 211, 153, 0.3) !important;
-    border-radius: 10px !important;
-    color: #34d399 !important;
-}
-
-.stError {
-    background-color: rgba(248, 113, 113, 0.1) !important;
-    border: 1px solid rgba(248, 113, 113, 0.3) !important;
-    border-radius: 10px !important;
-}
-
-/* ===== Info Alert (Sources) ===== */
-.stAlert {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 10px !important;
-    color: #94a3b8 !important;
-}
-
-/* ===== Animations ===== */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-.streaming-cursor {
-    animation: pulse 1s ease-in-out infinite;
-    color: #818cf8;
-    font-weight: bold;
-}
-
-/* ===== Login Page ===== */
-.login-container {
-    max-width: 440px;
-    margin: 4rem auto;
-    padding: 2.5rem;
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(20px);
-    border: 1px solid #334155;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-}
-
-.login-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.login-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #818cf8, #a78bfa, #c084fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
-}
-
-.login-header p {
-    color: #94a3b8;
-    font-size: 0.95rem;
-}
-
-/* ===== App Header ===== */
-.app-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0.5rem 0 1.5rem 0;
-    border-bottom: 1px solid #334155;
-    margin-bottom: 1.5rem;
-}
-
-.app-header h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #818cf8, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0;
-}
-
-/* ===== Collection Badge ===== */
-.collection-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(129, 140, 248, 0.15);
-    border: 1px solid rgba(129, 140, 248, 0.3);
-    color: #a5b4fc;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-/* ===== Stats Pills ===== */
-.stats-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(129, 140, 248, 0.1);
-    color: #94a3b8;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    margin-right: 6px;
-}
-
-/* ===== Section Headers ===== */
-.section-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 1rem 0 0.5rem 0;
-}
-
-/* ===== Supported Files Label ===== */
-.file-types {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 6px;
-}
-
-.file-type-badge {
-    background: rgba(129, 140, 248, 0.1);
-    border: 1px solid rgba(129, 140, 248, 0.2);
-    color: #a5b4fc;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 500;
-}
-
-/* ===== Logout Button Override ===== */
-.st-key-logout_btn > div > button {
-    background: transparent !important;
-    border: 1px solid #475569 !important;
-    color: #94a3b8 !important;
-    box-shadow: none !important;
-}
-
-.st-key-logout_btn > div > button:hover {
-    border-color: #f87171 !important;
-    color: #f87171 !important;
-    background: rgba(248, 113, 113, 0.1) !important;
-    box-shadow: none !important;
-}
-
-/* ===== Delete Button Override ===== */
-.st-key-delete_col_btn > div > button {
-    background: transparent !important;
-    border: 1px solid #475569 !important;
-    color: #94a3b8 !important;
-    box-shadow: none !important;
-    font-size: 0.8rem !important;
-}
-
-.st-key-delete_col_btn > div > button:hover {
-    border-color: #f87171 !important;
-    color: #f87171 !important;
-    background: rgba(248, 113, 113, 0.1) !important;
-    box-shadow: none !important;
-}
-
-/* ===== Clear Docs Button ===== */
-.st-key-clear_docs_btn > div > button {
-    background: transparent !important;
-    border: 1px solid #475569 !important;
-    color: #94a3b8 !important;
-    box-shadow: none !important;
-    font-size: 0.8rem !important;
-}
-
-.st-key-clear_docs_btn > div > button:hover {
-    border-color: #fbbf24 !important;
-    color: #fbbf24 !important;
-    background: rgba(251, 191, 36, 0.1) !important;
-    box-shadow: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ==========================================
-# Session Persistence
+# Session Persistence & Initialization
 # ==========================================
 def save_session(token):
     data = {
@@ -418,7 +48,7 @@ def clear_session():
     except FileNotFoundError:
         pass
 
-# Initialize Session State
+# Initialize States
 if "token" not in st.session_state:
     st.session_state.token = load_session()
 
@@ -431,13 +61,404 @@ if "active_collection" not in st.session_state:
 if "upload_status" not in st.session_state:
     st.session_state.upload_status = None
 
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "chat" if st.session_state.token else "landing"
+
+# Force routing if token state changes
+if st.session_state.token and st.session_state.current_page in ["landing", "login", "register"]:
+    st.session_state.current_page = "chat"
+elif not st.session_state.token and st.session_state.current_page == "chat":
+    st.session_state.current_page = "landing"
+
 def auth_headers():
     return {"Authorization": f"Bearer {st.session_state.token}"}
 
 # ==========================================
-# Authentication Functions
+# Dynamic Theme Variables
 # ==========================================
-def login(username, password):
+DARK_VARS = """
+    --bg-main: #09090b;
+    --bg-card: #18181b;
+    --border: #27272a;
+    --text-main: #f8fafc;
+    --text-muted: #a1a1aa;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --input-bg: #fffbeeb3; /* pale yellow tint like screenshot */
+    --input-text: #000000;
+"""
+
+LIGHT_VARS = """
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --border: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --input-bg: #ffffff;
+    --input-text: #0f172a;
+"""
+
+# ==========================================
+# Premium CSS Injection
+# ==========================================
+theme_vars = DARK_VARS if st.session_state.theme == "dark" else LIGHT_VARS
+
+st.markdown(f"""
+<style>
+/* ===== Google Font ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {{
+    {theme_vars}
+}}
+
+/* ===== Global Overrides ===== */
+html, body, [class*="css"] {{
+    font-family: 'Inter', sans-serif !important;
+}}
+
+/* Force background colors on the main app and Streamlit base containers */
+html, body, .stApp, [data-testid="stHeader"], [data-testid="stBottomBlockContainer"], [data-testid="stBottom"] > div, [data-testid="stBottom"] {{
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+}}
+
+/* Force transparent/card backgrounds on specific dark-retaining components */
+[data-testid="stFileUploadDropzone"], [data-testid="stFileUploader"] section, [data-testid="stChatInput"], [data-testid="stChatInput"] textarea {{
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+}}
+
+/* Fix file uploader and buttons inside it */
+[data-testid="stFileUploadDropzone"] *, [data-testid="stFileUploader"] button {{
+    color: var(--text-main) !important;
+}}
+
+[data-testid="stFileUploader"] button {{
+    background-color: var(--bg-main) !important;
+    border: 1px solid var(--border) !important;
+}}
+
+/* Ensure all text assumes primary color by default */
+p, h1, h2, h3, h4, h5, h6, span, div {{
+    color: var(--text-main) !important;
+}}
+
+/* ===== Hide Streamlit Branding ===== */
+#MainMenu {{visibility: hidden;}}
+footer {{visibility: hidden;}}
+header {{visibility: hidden;}}
+
+/* ===== Custom Scrollbar ===== */
+::-webkit-scrollbar {{
+    width: 6px;
+    height: 6px;
+}}
+::-webkit-scrollbar-track {{
+    background: transparent;
+}}
+::-webkit-scrollbar-thumb {{
+    background: var(--border);
+    border-radius: 3px;
+}}
+
+/* ===== Sidebar Styling ===== */
+[data-testid="stSidebar"] {{
+    background-color: var(--bg-card) !important;
+    border-right: 1px solid var(--border) !important;
+}}
+
+/* ===== Button Styling ===== */
+.stButton > button {{
+    background-color: var(--accent) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1.2rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+}}
+
+.stButton > button:hover {{
+    background-color: var(--accent-hover) !important;
+}}
+
+/* Reduce Streamlit default top padding */
+.block-container {{
+    padding-top: 2rem !important;
+}}
+
+/* ===== Landing Page Styling ===== */
+.hero-container {{
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+}}
+.hero-badge {{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--accent) !important;
+    margin-bottom: 2rem;
+}}
+.hero-title {{
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}}
+.hero-title span {{
+    color: var(--accent) !important;
+}}
+.hero-subtitle {{
+    font-size: 1.2rem;
+    color: var(--text-muted) !important;
+    max-width: 600px;
+    margin: 0 auto 2.5rem auto;
+    line-height: 1.6;
+    display: inline-block;
+}}
+
+.feature-card {{
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.2s;
+}}
+.feature-card:hover {{
+    border-color: var(--accent);
+}}
+.feature-icon {{
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent) !important;
+}}
+.feature-title {{
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}}
+.feature-desc {{
+    font-size: 0.9rem;
+    color: var(--text-muted) !important;
+    line-height: 1.5;
+}}
+
+/* ===== Login Modal Styling ===== */
+.login-wrapper {{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}}
+.login-card {{
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+}}
+.login-header {{
+    text-align: center;
+    margin-bottom: 2rem;
+}}
+.login-icon {{
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--accent) !important;
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}}
+.login-title {{
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}}
+.login-subtitle {{
+    color: var(--text-muted) !important;
+    font-size: 0.9rem;
+}}
+
+/* Auth Input Styling Override */
+.stTextInput > div > div > input {{
+    background-color: var(--input-bg) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: var(--input-text) !important;
+    padding: 0.8rem 1rem !important;
+}}
+.stTextInput > div > div > input:focus {{
+    box-shadow: 0 0 0 2px var(--accent) !important;
+}}
+
+/* Auth specific buttons */
+.st-key-auth_btn > div > button {{
+    width: 100% !important;
+    padding: 0.8rem !important;
+    font-size: 1rem !important;
+    margin-top: 1rem !important;
+}}
+
+/* Link styling */
+.auth-link-container {{
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted) !important;
+}}
+
+/* ===== Chat Input Styling ===== */
+[data-testid="stChatInput"], 
+.stChatInput,
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] textarea {{
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+    border-radius: 12px !important;
+    padding: 4px !important;
+}}
+
+/* Fix placeholder color */
+[data-testid="stChatInput"] textarea::placeholder {{
+    color: var(--text-muted) !important;
+}}
+
+[data-testid="stChatInput"]:focus-within {{
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}}
+
+/* ===== Chat Message Styling ===== */
+[data-testid="stChatMessage"] {{
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    padding: 1rem 1.2rem !important;
+    margin-bottom: 1rem !important;
+}}
+
+/* ===== General UI Components ===== */
+.stSelectbox > div > div {{
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+}}
+
+.streamlit-expanderHeader {{
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}}
+
+[data-testid="stFileUploader"] {{
+    background-color: var(--bg-card) !important;
+    border: 1px dashed var(--border) !important;
+}}
+
+/* ===== Alerts ===== */
+.stSuccess {{
+    background-color: rgba(52, 211, 153, 0.1) !important;
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+    color: #34d399 !important;
+}}
+
+.stError {{
+    background-color: rgba(248, 113, 113, 0.1) !important;
+    border: 1px solid rgba(248, 113, 113, 0.3) !important;
+}}
+
+/* ===== Badges & Pills ===== */
+.collection-badge {{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: var(--accent) !important;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}}
+
+.stats-pill {{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--text-muted) !important;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-right: 6px;
+}}
+
+.file-type-badge {{
+    background: var(--border);
+    color: var(--text-muted) !important;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}}
+
+/* ===== Special Buttons Override ===== */
+.st-key-secondary_btn > div > button,
+.st-key-clear_docs_btn > div > button,
+.st-key-delete_col_btn > div > button,
+.st-key-logout_btn > div > button {{
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}}
+
+.st-key-secondary_btn > div > button:hover {{
+    border-color: var(--text-main) !important;
+    color: var(--text-main) !important;
+}}
+
+/* ===== App Header Area ===== */
+.app-header-flex {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}}
+.app-header-title {{
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+}}
+</style>
+""", unsafe_allow_html=True)
+
+
+# ==========================================
+# Authentication API Calls
+# ==========================================
+def api_login(username, password):
     try:
         response = requests.post(
             f"{BACKEND_URL}/api/auth/login",
@@ -446,6 +467,7 @@ def login(username, password):
         if response.status_code == 200:
             token = response.json().get("access_token")
             st.session_state.token = token
+            st.session_state.current_page = "chat"
             save_session(token)
             st.rerun()
         else:
@@ -453,14 +475,16 @@ def login(username, password):
     except Exception as e:
         st.error(f"Connection error: {e}")
 
-def register(username, email, password):
+def api_register(username, email, password):
     try:
         response = requests.post(
             f"{BACKEND_URL}/api/auth/register",
             json={"username": username, "email": email, "password": password}
         )
         if response.status_code == 200:
-            st.success("Account created! You can now log in.")
+            st.success("Account created! Please sign in.")
+            st.session_state.current_page = "login"
+            st.rerun()
         else:
             detail = response.json().get("detail", "Registration failed")
             st.error(detail)
@@ -471,326 +495,394 @@ def logout():
     st.session_state.token = None
     st.session_state.messages = []
     st.session_state.active_collection = None
+    st.session_state.current_page = "landing"
     clear_session()
-    st.rerun()
 
 # ==========================================
-# LOGIN PAGE
+# PAGE ROUTERS
 # ==========================================
-if not st.session_state.token:
-    # Centered login card
+
+def render_landing_page():
+    # Hide sidebar on landing page using CSS hack
+    st.markdown("""<style>[data-testid="stSidebar"] {display: none;}</style>""", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="hero-container">
+        <div class="hero-badge">
+            <span style="font-size:1.1rem;">🌐</span> Enterprise Agentic RAG System
+        </div>
+        <h1 class="hero-title">Chat with your <span>documents</span><br>intelligently</h1>
+        <p class="hero-subtitle">Upload financial reports, legal contracts, or research papers and get accurate, cited insights powered by advanced AI retrieval.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Use tighter symmetrical columns to center the two buttons properly without stretching
+    col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1.5])
+    with col2:
+        if st.button("Get Started Free", key="get_started", use_container_width=True):
+            st.session_state.current_page = "register"
+            st.rerun()
+    with col3:
+        if st.button("Sign In", key="secondary_btn", use_container_width=True):
+            st.session_state.current_page = "login"
+            st.rerun()
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # Feature Grid
+    features = [
+        {"icon": "📄", "title": "Multi-Format Upload", "desc": "PDF, DOCX, TXT, and Markdown with smart chunking."},
+        {"icon": "🔍", "title": "Semantic Search", "desc": "Two-stage retrieval with high-precision embeddings."},
+        {"icon": "💬", "title": "Streaming Chat", "desc": "Real-time AI responses with inline source citations."},
+        {"icon": "⚡", "title": "Instant Insights", "desc": "Extract key facts, summaries, and complex data points."},
+        {"icon": "🛡️", "title": "Data Isolation", "desc": "Per-user vector collections for complete privacy."},
+        {"icon": "🤖", "title": "Advanced LLMs", "desc": "Powered by the robust Google Gemini ecosystem."}
+    ]
+
+    for i in range(0, len(features), 3):
+        cols = st.columns(3)
+        for j in range(3):
+            if i + j < len(features):
+                f = features[i + j]
+                cols[j].markdown(f"""
+                <div class="feature-card">
+                    <div class="feature-icon">{f["icon"]}</div>
+                    <div class="feature-title">{f["title"]}</div>
+                    <div class="feature-desc">{f["desc"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+def render_login_page():
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {display: none;}
+    /* Target the middle column to act as the login card */
+    [data-testid="column"]:nth-of-type(2) {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        margin-top: 10vh;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
         st.markdown("""
-        <div class="login-header">
-            <h1>🧠 RAG AI Assistant</h1>
-            <p>Your intelligent document companion</p>
-        </div>
+            <div class="login-header">
+                <div class="login-icon">🧠</div>
+                <h1 class="login-title">Welcome back</h1>
+                <p class="login-subtitle">Sign in to your Document AI Analyst account</p>
+            </div>
         """, unsafe_allow_html=True)
         
-        tab1, tab2 = st.tabs(["Sign In", "Create Account"])
+        log_user = st.text_input("Username", key="log_user", label_visibility="collapsed", placeholder="Username")
+        log_pass = st.text_input("Password", type="password", key="log_pass", label_visibility="collapsed", placeholder="Password")
         
-        with tab1:
-            log_user = st.text_input("Username", key="log_user", placeholder="Enter your username")
-            log_pass = st.text_input("Password", type="password", key="log_pass", placeholder="Enter your password")
-            st.markdown("")  # Spacer
-            if st.button("Sign In", use_container_width=True, key="login_btn"):
-                if log_user and log_pass:
-                    login(log_user, log_pass)
-                else:
-                    st.warning("Please fill in all fields")
+        if st.button("Sign In", key="auth_btn"):
+            if log_user and log_pass:
+                api_login(log_user, log_pass)
+            else:
+                st.warning("Please fill in all fields")
                 
-        with tab2:
-            reg_user = st.text_input("Username", key="reg_user", placeholder="Choose a username")
-            reg_email = st.text_input("Email", key="reg_email", placeholder="your@email.com")
-            reg_pass = st.text_input("Password", type="password", key="reg_pass", placeholder="Create a password")
-            st.markdown("")
-            if st.button("Create Account", use_container_width=True, key="register_btn"):
-                if reg_user and reg_email and reg_pass:
-                    register(reg_user, reg_email, reg_pass)
-                else:
-                    st.warning("Please fill in all fields")
-    
-    st.stop()
+        st.markdown("""
+            <div class="auth-link-container">
+                Don't have an account? 
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button("Create one", key="secondary_btn", use_container_width=True):
+            st.session_state.current_page = "register"
+            st.rerun()
 
-# ==========================================
-# MAIN APPLICATION
-# ==========================================
+def render_register_page():
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {display: none;}
+    /* Target the middle column to act as the register card */
+    [data-testid="column"]:nth-of-type(2) {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        margin-top: 10vh;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 1.2, 1])
+    with col2:
+        st.markdown("""
+            <div class="login-header">
+                <div class="login-icon">✨</div>
+                <h1 class="login-title">Create account</h1>
+                <p class="login-subtitle">Join Document AI Analyst today</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        reg_user = st.text_input("Username", key="reg_user", label_visibility="collapsed", placeholder="Username")
+        reg_email = st.text_input("Email", key="reg_email", label_visibility="collapsed", placeholder="Email address")
+        reg_pass = st.text_input("Password", type="password", key="reg_pass", label_visibility="collapsed", placeholder="Password")
+        
+        if st.button("Create Account", key="auth_btn"):
+            if reg_user and reg_email and reg_pass:
+                api_register(reg_user, reg_email, reg_pass)
+            else:
+                st.warning("Please fill in all fields")
+                
+        st.markdown("""
+            <div class="auth-link-container">
+                Already have an account? 
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button("Sign In", key="secondary_btn", use_container_width=True):
+            st.session_state.current_page = "login"
+            st.rerun()
 
-# App Header
-st.markdown("""
-<div class="app-header">
-    <h1>🧠 RAG AI Assistant</h1>
-</div>
-""", unsafe_allow_html=True)
-
-# ==========================================
-# SIDEBAR
-# ==========================================
-with st.sidebar:
-    # ---- Knowledge Bases ----
-    st.markdown('<div class="section-header">📚 KNOWLEDGE BASES</div>', unsafe_allow_html=True)
-    
-    # Fetch collections
-    try:
-        cols_response = requests.get(
-            f"{BACKEND_URL}/api/documents/collections",
-            headers=auth_headers()
-        )
-        collections = cols_response.json() if cols_response.status_code == 200 else []
-    except Exception:
-        collections = []
-    
-    # Collection selector
-    collection_names = ["Default"] + [c["name"] for c in collections]
-    collection_ids = [None] + [c["id"] for c in collections]
-    
-    selected_idx = st.selectbox(
-        "Active Knowledge Base",
-        range(len(collection_names)),
-        format_func=lambda i: collection_names[i],
-        key="collection_selector",
-        label_visibility="collapsed"
-    )
-    
-    st.session_state.active_collection = collection_ids[selected_idx]
-    
-    # Show collection stats
-    if selected_idx > 0:
-        col_data = collections[selected_idx - 1]
-        st.markdown(f"""
-        <div style="margin: -0.5rem 0 0.5rem 0;">
-            <span class="stats-pill">📄 {col_data['doc_count']} docs</span>
-            <span class="stats-pill">🧩 {col_data['chunk_count']} chunks</span>
+def render_chat_page():
+    # ==========================================
+    # HEADER AREA (With Theme Toggle)
+    # ==========================================
+    h_col1, h_col2 = st.columns([5, 1])
+    with h_col1:
+        st.markdown("""
+        <div class="app-header-flex">
+            <h1 class="app-header-title">🧠 Document AI Analyst</h1>
         </div>
         """, unsafe_allow_html=True)
-    
-    # Create new collection
-    with st.expander("➕ New Knowledge Base"):
-        new_col_name = st.text_input("Name", key="new_col_name", placeholder="e.g. Research Papers")
-        new_col_desc = st.text_input("Description", key="new_col_desc", placeholder="Optional description")
-        if st.button("Create", key="create_col_btn", use_container_width=True):
-            if new_col_name:
+    with h_col2:
+        theme_icon = "☀️ Light" if st.session_state.theme == "dark" else "🌙 Dark"
+        if st.button(theme_icon, key="secondary_btn", use_container_width=True):
+            st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+            st.rerun()
+
+    # ==========================================
+    # SIDEBAR
+    # ==========================================
+    with st.sidebar:
+        st.markdown('<div style="font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.85rem;">📚 KNOWLEDGE BASES</div>', unsafe_allow_html=True)
+        
+        # Fetch collections
+        try:
+            cols_response = requests.get(
+                f"{BACKEND_URL}/api/documents/collections",
+                headers=auth_headers()
+            )
+            collections = cols_response.json() if cols_response.status_code == 200 else []
+        except Exception:
+            collections = []
+        
+        collection_names = ["Default"] + [c["name"] for c in collections]
+        collection_ids = [None] + [c["id"] for c in collections]
+        
+        selected_idx = st.selectbox(
+            "Active Knowledge Base",
+            range(len(collection_names)),
+            format_func=lambda i: collection_names[i],
+            key="collection_selector",
+            label_visibility="collapsed"
+        )
+        
+        st.session_state.active_collection = collection_ids[selected_idx]
+        
+        if selected_idx > 0:
+            col_data = collections[selected_idx - 1]
+            st.markdown(f"""
+            <div style="margin: -0.5rem 0 0.5rem 0;">
+                <span class="stats-pill">📄 {col_data['doc_count']} docs</span>
+                <span class="stats-pill">🧩 {col_data['chunk_count']} chunks</span>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with st.expander("➕ New Knowledge Base"):
+            new_col_name = st.text_input("Name", key="new_col_name", placeholder="e.g. Research Papers")
+            new_col_desc = st.text_input("Description", key="new_col_desc", placeholder="Optional description")
+            if st.button("Create", key="create_col_btn", use_container_width=True):
+                if new_col_name:
+                    try:
+                        resp = requests.post(
+                            f"{BACKEND_URL}/api/documents/collections",
+                            headers=auth_headers(),
+                            json={"name": new_col_name, "description": new_col_desc}
+                        )
+                        if resp.status_code == 200:
+                            st.session_state.upload_status = ("success", f"Created '{new_col_name}'!")
+                            st.rerun()
+                        else:
+                            st.error(resp.json().get("detail", "Failed"))
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                else:
+                    st.warning("Enter a name")
+        
+        if selected_idx > 0:
+            if st.button("🗑️ Delete Collection", key="delete_col_btn", use_container_width=True):
                 try:
-                    resp = requests.post(
-                        f"{BACKEND_URL}/api/documents/collections",
-                        headers=auth_headers(),
-                        json={"name": new_col_name, "description": new_col_desc}
+                    resp = requests.delete(
+                        f"{BACKEND_URL}/api/documents/collections/{collection_ids[selected_idx]}",
+                        headers=auth_headers()
                     )
                     if resp.status_code == 200:
-                        st.session_state.upload_status = ("success", f"Created '{new_col_name}'!")
+                        st.session_state.active_collection = None
+                        st.session_state.upload_status = ("success", "Collection deleted")
                         st.rerun()
-                    else:
-                        st.error(resp.json().get("detail", "Failed"))
                 except Exception as e:
                     st.error(f"Error: {e}")
+        
+        st.markdown("---")
+        
+        st.markdown('<div style="font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.85rem;">📤 UPLOAD DOCUMENT</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+            <span class="file-type-badge">PDF</span>
+            <span class="file-type-badge">TXT</span>
+            <span class="file-type-badge">DOCX</span>
+            <span class="file-type-badge">CSV</span>
+            <span class="file-type-badge">MD</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        uploaded_file = st.file_uploader(
+            "Drop your file here",
+            type=["pdf", "txt", "docx", "csv", "md"],
+            key="file_uploader",
+            label_visibility="collapsed"
+        )
+        
+        if st.session_state.upload_status:
+            msg_type, msg_text = st.session_state.upload_status
+            if msg_type == "success":
+                st.success(msg_text)
+            elif msg_type == "error":
+                st.error(msg_text)
+            st.session_state.upload_status = None
+        
+        if st.button("Upload & Process", key="upload_btn", use_container_width=True):
+            if uploaded_file is not None:
+                with st.spinner("Processing..."):
+                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
+                    params = {}
+                    if st.session_state.active_collection:
+                        params["collection_id"] = st.session_state.active_collection
+                    try:
+                        response = requests.post(
+                            f"{BACKEND_URL}/api/documents/upload",
+                            headers=auth_headers(),
+                            files=files,
+                            params=params
+                        )
+                        if response.status_code == 200:
+                            data = response.json()
+                            st.session_state.upload_status = ("success", f"✅ {uploaded_file.name} — {data.get('chunks_created')} chunks")
+                            st.rerun()
+                        else:
+                            st.session_state.upload_status = ("error", f"Failed: {response.text}")
+                            st.rerun()
+                    except Exception as e:
+                        st.session_state.upload_status = ("error", f"Error: {e}")
+                        st.rerun()
             else:
-                st.warning("Enter a name")
-    
-    # Delete collection
-    if selected_idx > 0:
-        if st.button("🗑️ Delete Collection", key="delete_col_btn", use_container_width=True):
+                st.warning("Select a file first")
+        
+        if st.button("🧹 Clear All Documents", key="clear_docs_btn", use_container_width=True):
             try:
-                resp = requests.delete(
-                    f"{BACKEND_URL}/api/documents/collections/{collection_ids[selected_idx]}",
-                    headers=auth_headers()
-                )
+                if st.session_state.active_collection:
+                    col_id = st.session_state.active_collection
+                    resp = requests.delete(f"{BACKEND_URL}/api/documents/collections/{col_id}", headers=auth_headers())
+                else:
+                    resp = requests.delete(f"{BACKEND_URL}/api/documents/clear-default", headers=auth_headers())
                 if resp.status_code == 200:
-                    st.session_state.active_collection = None
-                    st.session_state.upload_status = ("success", "Collection deleted")
+                    st.session_state.upload_status = ("success", "🧹 All documents cleared!")
                     st.rerun()
+                else:
+                    st.error("Failed to clear")
             except Exception as e:
                 st.error(f"Error: {e}")
-    
-    st.markdown("---")
-    
-    # ---- Document Upload ----
-    st.markdown('<div class="section-header">📤 UPLOAD DOCUMENT</div>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="file-types">
-        <span class="file-type-badge">PDF</span>
-        <span class="file-type-badge">TXT</span>
-        <span class="file-type-badge">DOCX</span>
-        <span class="file-type-badge">CSV</span>
-        <span class="file-type-badge">MD</span>
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown("")
-    
-    uploaded_file = st.file_uploader(
-        "Drop your file here",
-        type=["pdf", "txt", "docx", "csv", "md"],
-        key="file_uploader",
-        label_visibility="collapsed"
-    )
-    
-    # Show upload status
-    if st.session_state.upload_status:
-        msg_type, msg_text = st.session_state.upload_status
-        if msg_type == "success":
-            st.success(msg_text)
-        elif msg_type == "error":
-            st.error(msg_text)
-        st.session_state.upload_status = None
-    
-    if st.button("Upload & Process", key="upload_btn", use_container_width=True):
-        if uploaded_file is not None:
-            with st.spinner("Processing..."):
-                files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
-                params = {}
-                if st.session_state.active_collection:
-                    params["collection_id"] = st.session_state.active_collection
-                try:
-                    response = requests.post(
-                        f"{BACKEND_URL}/api/documents/upload",
-                        headers=auth_headers(),
-                        files=files,
-                        params=params
-                    )
-                    if response.status_code == 200:
-                        data = response.json()
-                        st.session_state.upload_status = ("success", f"✅ {uploaded_file.name} — {data.get('chunks_created')} chunks")
-                        st.rerun()
-                    else:
-                        st.session_state.upload_status = ("error", f"Failed: {response.text}")
-                        st.rerun()
-                except Exception as e:
-                    st.session_state.upload_status = ("error", f"Error: {e}")
-                    st.rerun()
+        
+        st.markdown("---")
+        st.caption(f"⏱️ Session: {SESSION_DURATION_MINUTES} min")
+        st.button("Sign Out", key="logout_btn", use_container_width=True, on_click=logout)
+
+    # ==========================================
+    # MAIN CHAT AREA
+    # ==========================================
+    if st.session_state.active_collection:
+        active_col = next((c for c in collections if c["id"] == st.session_state.active_collection), None)
+        if active_col:
+            chroma_name = f"col_{active_col['id'][:8]}"
+            st.caption(f"📚 Chatting with: **{active_col['name']}**")
         else:
-            st.warning("Select a file first")
-    
-    # Clear documents button
-    if st.button("🧹 Clear All Documents", key="clear_docs_btn", use_container_width=True):
-        try:
-            chroma = chroma_name if st.session_state.active_collection else "rag_collection"
-            if st.session_state.active_collection:
-                # Delete the custom collection
-                col_id = st.session_state.active_collection
-                resp = requests.delete(
-                    f"{BACKEND_URL}/api/documents/collections/{col_id}",
-                    headers=auth_headers()
-                )
-            else:
-                # Clear default collection
-                resp = requests.delete(
-                    f"{BACKEND_URL}/api/documents/clear-default",
-                    headers=auth_headers()
-                )
-            if resp.status_code == 200:
-                st.session_state.upload_status = ("success", "🧹 All documents cleared!")
-                st.rerun()
-            else:
-                st.error("Failed to clear")
-        except Exception as e:
-            st.error(f"Error: {e}")
-    
-    st.markdown("---")
-    
-    # ---- Footer ----
-    st.caption(f"⏱️ Session: {SESSION_DURATION_MINUTES} min")
-    st.button("Sign Out", key="logout_btn", use_container_width=True, on_click=logout)
-
-# ==========================================
-# CHAT INTERFACE
-# ==========================================
-
-# Determine active collection
-if st.session_state.active_collection:
-    active_col = next(
-        (c for c in collections if c["id"] == st.session_state.active_collection),
-        None
-    )
-    if active_col:
-        chroma_name = f"col_{active_col['id'][:8]}"
-        st.caption(f"📚 Chatting with: **{active_col['name']}**")
+            chroma_name = "rag_collection"
     else:
         chroma_name = "rag_collection"
-else:
-    chroma_name = "rag_collection"
-    st.caption("📚 Chatting with: **Default**")
+        st.caption("📚 Chatting with: **Default**")
 
-st.markdown("")
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+            if "sources" in message and message["sources"]:
+                with st.expander(f"📎 {len(message['sources'])} Sources"):
+                    for source in message["sources"]:
+                        score = source['similarity']
+                        st.markdown(f"**Relevance:** `{score:.3f}`")
+                        st.info(source['text'][:300] + ("..." if len(source['text']) > 300 else ""))
 
-# Display chat history
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        if "sources" in message and message["sources"]:
-            with st.expander(f"📎 {len(message['sources'])} Sources"):
-                for source in message["sources"]:
-                    score = source['similarity']
-                    st.markdown(f"**Relevance:** `{score:.3f}`")
-                    st.info(source['text'][:300] + ("..." if len(source['text']) > 300 else ""))
+    if prompt := st.chat_input("Ask anything about your documents..."):
+        st.chat_message("user").markdown(prompt)
+        st.session_state.messages.append({"role": "user", "content": prompt})
 
-# Chat input
-if prompt := st.chat_input("Ask anything about your documents..."):
-    st.chat_message("user").markdown(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            payload = {"query": prompt, "top_k": 5, "collection_name": chroma_name}
+            try:
+                response = requests.post(
+                    f"{BACKEND_URL}/api/chat/query/stream",
+                    headers=auth_headers(),
+                    json=payload,
+                    stream=True
+                )
+                if response.status_code == 200:
+                    full_answer = ""
+                    sources = []
+                    for line in response.iter_lines(decode_unicode=True):
+                        if line and line.startswith("data: "):
+                            data_str = line[6:]
+                            if data_str == "[DONE]": break
+                            try:
+                                event = json.loads(data_str)
+                                if event["type"] == "text":
+                                    full_answer += event["content"]
+                                    message_placeholder.markdown(full_answer + " ▌")
+                                elif event["type"] == "sources":
+                                    sources = event["content"]
+                            except json.JSONDecodeError: continue
+                    message_placeholder.markdown(full_answer)
+                    if sources:
+                        with st.expander(f"📎 {len(sources)} Sources"):
+                            for source in sources:
+                                score = source['similarity']
+                                st.markdown(f"**Relevance:** `{score:.3f}`")
+                                st.info(source['text'][:300] + ("..." if len(source['text']) > 300 else ""))
+                    st.session_state.messages.append({"role": "assistant", "content": full_answer, "sources": sources})
+                elif response.status_code == 401:
+                    message_placeholder.markdown("⏰ Session expired. Please sign in again.")
+                    logout()
+                else:
+                    message_placeholder.markdown(f"❌ Error: {response.text}")
+                    st.session_state.messages.append({"role": "assistant", "content": f"Error: {response.text}"})
+            except Exception as e:
+                message_placeholder.markdown(f"❌ Connection error: {e}")
+                st.session_state.messages.append({"role": "assistant", "content": f"Error: {e}"})
 
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        
-        payload = {
-            "query": prompt,
-            "top_k": 5,
-            "collection_name": chroma_name
-        }
-        
-        try:
-            response = requests.post(
-                f"{BACKEND_URL}/api/chat/query/stream",
-                headers=auth_headers(),
-                json=payload,
-                stream=True
-            )
-            
-            if response.status_code == 200:
-                full_answer = ""
-                sources = []
-                
-                for line in response.iter_lines(decode_unicode=True):
-                    if line and line.startswith("data: "):
-                        data_str = line[6:]
-                        
-                        if data_str == "[DONE]":
-                            break
-                        
-                        try:
-                            event = json.loads(data_str)
-                            if event["type"] == "text":
-                                full_answer += event["content"]
-                                message_placeholder.markdown(full_answer + " ▌")
-                            elif event["type"] == "sources":
-                                sources = event["content"]
-                        except json.JSONDecodeError:
-                            continue
-                
-                # Final render
-                message_placeholder.markdown(full_answer)
-                
-                if sources:
-                    with st.expander(f"📎 {len(sources)} Sources"):
-                        for source in sources:
-                            score = source['similarity']
-                            st.markdown(f"**Relevance:** `{score:.3f}`")
-                            st.info(source['text'][:300] + ("..." if len(source['text']) > 300 else ""))
-                
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": full_answer,
-                    "sources": sources
-                })
-            elif response.status_code == 401:
-                message_placeholder.markdown("⏰ Session expired. Please sign in again.")
-                st.session_state.token = None
-                clear_session()
-                st.rerun()
-            else:
-                message_placeholder.markdown(f"❌ Error: {response.text}")
-                st.session_state.messages.append({"role": "assistant", "content": f"Error: {response.text}"})
-                
-        except Exception as e:
-            message_placeholder.markdown(f"❌ Connection error: {e}")
-            st.session_state.messages.append({"role": "assistant", "content": f"Error: {e}"})
+# ==========================================
+# APP ROUTER
+# ==========================================
+if st.session_state.current_page == "landing":
+    render_landing_page()
+elif st.session_state.current_page == "login":
+    render_login_page()
+elif st.session_state.current_page == "register":
+    render_register_page()
+elif st.session_state.current_page == "chat":
+    render_chat_page()
