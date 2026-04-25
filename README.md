@@ -1,70 +1,83 @@
-# 🧠 Premium RAG AI Assistant
+---
+title: Document AI Analyst
+emoji: 🧠
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 8501
+pinned: true
+license: mit
+short_description: Enterprise Agentic RAG — upload documents and chat with AI
+---
 
-A full-stack, production-ready Retrieval-Augmented Generation (RAG) application with a premium dark-themed UI. Upload documents, organize them into separate knowledge bases, and chat with them using Google's Gemini LLM.
+# 🧠 Document AI Analyst — Enterprise Agentic RAG System
+
+Upload complex PDFs, DOCX files, CSVs, or text documents and chat with an AI agent that provides accurate, cited insights powered by Retrieval-Augmented Generation.
 
 ## ✨ Features
 
-- **Multi-Document Knowledge Bases**: Create isolated collections for different contexts (e.g., "Resumes", "Research", "Notes").
-- **Extended File Support**: Process PDF, TXT, DOCX, CSV, and Markdown files.
-- **Streaming Responses**: Real-time, word-by-word LLM answers with a pulsing cursor effect.
-- **Premium UI/UX**: Custom dark theme, glassmorphism elements, gradient accents, and micro-animations.
-- **Persistent Sessions**: Stay logged in across browser refreshes (15-minute file-based persistence).
-- **Source Citations**: View exactly which document chunks the AI used to formulate its answer, complete with relevance scores.
+- **Multi-Format Upload** — PDF, DOCX, TXT, CSV, and Markdown with smart chunking
+- **Semantic Search** — High-precision vector retrieval using Google Gemini embeddings
+- **Streaming Chat** — Real-time AI responses with inline source citations
+- **Data Isolation** — Per-user knowledge bases and vector collections for complete privacy
+- **Persistent Sessions** — Seamless authentication with secure JWT tokens
+- **Premium UI** — Custom dark-themed Streamlit interface with glassmorphism and micro-animations
 
 ## 🏗️ Architecture
 
-- **Frontend**: Streamlit (with custom CSS injection and SSE streaming)
-- **Backend API**: FastAPI (Python 3.10)
-- **Database (Relational)**: PostgreSQL (Users, Document Metadata, Collections)
-- **Database (Vector)**: ChromaDB (Embeddings, Semantic Search)
-- **Cache / Rate Limiting**: Redis
-- **LLM & Embeddings**: Google Gemini (`gemini-2.5-flash-lite` & `gemini-embedding-001`)
-- **Infrastructure**: Docker Compose (Containerized setup)
+| Layer | Technology |
+|---|---|
+| **Frontend** | Streamlit, Custom CSS Injection, SSE |
+| **Backend** | FastAPI, SQLAlchemy, JWT Auth |
+| **Embeddings** | Google Gemini (`gemini-embedding-001`) |
+| **Vector Store** | ChromaDB (persistent, per-user collections) |
+| **Database** | PostgreSQL (User metadata, Document tracking) |
+| **LLM** | Google Gemini (`gemini-2.5-flash-lite`) |
+| **Deployment** | Docker Compose multi-container orchestration |
 
 ## 🚀 Quick Start
 
-### 1. Prerequisites
-- Docker and Docker Compose installed
-- Google Gemini API Key
+1. Clone the repository and create your `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Add your Gemini API Key to the `.env` file.
+3. Start the application using Docker Compose:
+   ```bash
+   docker compose up -d --build
+   ```
+4. Access the UI at `http://localhost:8501`. Register an account, upload a document, and start chatting!
 
-### 2. Environment Setup
-Create a `.env` file in the root directory:
+## 🔧 Local Development
+
+### Backend
 ```bash
-cp .env.example .env
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000 --reload
 ```
-Edit `.env` and add your Gemini API Key and desired passwords.
 
-### 3. Run the Application
+### Frontend
 ```bash
-docker compose up -d --build
+cd frontend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
-### 4. Access the UI
-Open your browser and navigate to:
-`http://localhost:8501`
+## 📦 Environment Variables
 
-## 📂 Project Structure
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | ✅ | Google Gemini API key for LLM and embeddings |
+| `POSTGRES_USER` | ✅ | PostgreSQL database user |
+| `POSTGRES_PASSWORD` | ✅ | PostgreSQL database password |
+| `POSTGRES_DB` | ✅ | PostgreSQL database name |
+| `SECRET_KEY` | ✅ | JWT signing secret string |
 
-```
-.
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI entry point
-│   │   ├── routers/             # API endpoints (auth, documents, chat)
-│   │   ├── services/            # Core logic (LLM, embeddings, extraction)
-│   │   └── models/              # SQLAlchemy database models
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/
-│   ├── .streamlit/
-│   │   └── config.toml          # Native Streamlit dark theme config
-│   ├── app.py                   # Streamlit UI & custom CSS
-│   ├── requirements.txt
-│   └── Dockerfile
-├── docker-compose.yml           # Multi-container orchestration
-├── .env.example                 # Environment variables template
-└── .gitignore
-```
+## 🛠️ Tech Stack
 
-## 🔒 Security Note
-This project uses hardcoded secrets in the `docker-compose.yml` for demonstration purposes. Before deploying to production, ensure all secrets are properly managed via the `.env` file and not committed to version control.
+Built with: FastAPI • Streamlit • ChromaDB • Google Gemini • PostgreSQL • Docker Compose
