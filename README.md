@@ -4,7 +4,7 @@ emoji: 🧠
 colorFrom: indigo
 colorTo: purple
 sdk: docker
-app_port: 8501
+app_port: 80
 pinned: true
 license: mit
 short_description: Enterprise Agentic RAG — upload documents and chat with AI
