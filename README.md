@@ -4,7 +4,7 @@ emoji: 🧠
 colorFrom: indigo
 colorTo: purple
 sdk: docker
-app_port: 80
+app_port: 7860
 pinned: true
 license: mit
 short_description: Enterprise Agentic RAG — upload documents and chat with AI
@@ -46,7 +46,7 @@ Upload complex PDFs, DOCX files, CSVs, or text documents and chat with an AI age
    ```bash
    docker compose up -d --build
    ```
-4. Access the UI at `http://localhost:8501`. Register an account, upload a document, and start chatting!
+4. Access the UI at `http://localhost:7860`. Register an account, upload a document, and start chatting!
 
 ## 🔧 Local Development
 
