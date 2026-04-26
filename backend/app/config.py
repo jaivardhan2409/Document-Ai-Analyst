@@ -2,7 +2,7 @@ import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://rag_user:rag_password@postgres:5432/rag_database")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
     VECTOR_DB_PATH: str = os.getenv("VECTOR_DB_PATH", "./chroma_db")
     LLM_PROVIDER: str = "ollama"
     GEMINI_API_KEY: str = ""
