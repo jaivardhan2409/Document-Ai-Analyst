@@ -80,27 +80,27 @@ def auth_headers():
 # Dynamic Theme Variables
 # ==========================================
 DARK_VARS = """
-    --bg-main: #09090b;
-    --bg-card: #18181b;
-    --border: #27272a;
-    --text-main: #f8fafc;
-    --text-muted: #a1a1aa;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --input-bg: #fffbeeb3; /* pale yellow tint like screenshot */
-    --input-text: #000000;
+    --bg-main: #0b0914;
+    --bg-card: #13111f;
+    --border: #2a2542;
+    --text-main: #f8f7fa;
+    --text-muted: #9e98b5;
+    --accent: #8b5cf6;
+    --accent-hover: #7c3aed;
+    --input-bg: #1f1c2e;
+    --input-text: #f8f7fa;
 """
 
 LIGHT_VARS = """
-    --bg-main: #f8fafc;
+    --bg-main: #f5f3ff;
     --bg-card: #ffffff;
-    --border: #e2e8f0;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
+    --border: #ddd6fe;
+    --text-main: #1e1b4b;
+    --text-muted: #6b7280;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
     --input-bg: #ffffff;
-    --input-text: #0f172a;
+    --input-text: #1e1b4b;
 """
 
 # ==========================================
@@ -219,7 +219,10 @@ header {{visibility: hidden;}}
     margin-bottom: 1rem;
 }}
 .hero-title span {{
-    color: var(--accent) !important;
+    background: linear-gradient(90deg, var(--accent), #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
 }}
 .hero-subtitle {{
     font-size: 1.2rem;
@@ -509,10 +512,10 @@ def render_landing_page():
     st.markdown("""
     <div class="hero-container">
         <div class="hero-badge">
-            <span style="font-size:1.1rem;">🌐</span> Enterprise Agentic RAG System
+            <span style="font-size:1.1rem;">✨</span> Next-Gen AI Document Analysis
         </div>
-        <h1 class="hero-title">Chat with your <span>documents</span><br>intelligently</h1>
-        <p class="hero-subtitle">Upload financial reports, legal contracts, or research papers and get accurate, cited insights powered by advanced AI retrieval.</p>
+        <h1 class="hero-title">Unlock the Power of <br><span>Your Documents</span></h1>
+        <p class="hero-subtitle">Experience the future of research. Upload your most complex PDFs, reports, and contracts, and let our Enterprise Agentic RAG system instantly extract precise, cited insights.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -552,6 +555,13 @@ def render_landing_page():
                 </div>
                 """, unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
+
+    # Signature
+    st.markdown("""
+        <div style="text-align: center; margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.95rem; letter-spacing: 0.5px;">
+            Made with ❤️ by <strong style="color: var(--text-main);">Jaivardhan2409</strong>
+        </div>
+    """, unsafe_allow_html=True)
 
 def render_login_page():
     st.markdown("""
