@@ -539,7 +539,7 @@ def render_landing_page():
         {"icon": "💬", "title": "Streaming Chat", "desc": "Real-time AI responses with inline source citations."},
         {"icon": "⚡", "title": "Instant Insights", "desc": "Extract key facts, summaries, and complex data points."},
         {"icon": "🛡️", "title": "Data Isolation", "desc": "Per-user vector collections for complete privacy."},
-        {"icon": "🤖", "title": "Advanced LLMs", "desc": "Powered by the robust Google Gemini ecosystem."}
+        {"icon": "🤖", "title": "Enterprise Intelligence", "desc": "Context-aware reasoning engine designed for complex analytical workflows."}
     ]
 
     for i in range(0, len(features), 3):
