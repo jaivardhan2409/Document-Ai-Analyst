@@ -11,6 +11,6 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://redis:6379"
     SECRET_KEY: str = "supersecretkey_please_change_in_production"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
 settings = Settings()

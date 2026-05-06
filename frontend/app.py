@@ -7,9 +7,6 @@ from datetime import datetime, timedelta
 # Backend URL Configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
-# Session duration in minutes
-SESSION_DURATION_MINUTES = 15
-SESSION_FILE = "/tmp/rag_session.json"
 
 st.set_page_config(
     page_title="Document AI Analyst",
@@ -18,39 +15,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==========================================
-# Session Persistence & Initialization
-# ==========================================
-def save_session(token):
-    data = {
-        "token": token,
-        "expires_at": (datetime.now() + timedelta(minutes=SESSION_DURATION_MINUTES)).isoformat()
-    }
-    with open(SESSION_FILE, "w") as f:
-        json.dump(data, f)
-
-def load_session():
-    try:
-        with open(SESSION_FILE, "r") as f:
-            data = json.load(f)
-        expires_at = datetime.fromisoformat(data["expires_at"])
-        if datetime.now() < expires_at:
-            return data["token"]
-        else:
-            os.remove(SESSION_FILE)
-            return None
-    except (FileNotFoundError, json.JSONDecodeError, KeyError):
-        return None
-
-def clear_session():
-    try:
-        os.remove(SESSION_FILE)
-    except FileNotFoundError:
-        pass
-
 # Initialize States
 if "token" not in st.session_state:
-    st.session_state.token = load_session()
+    st.session_state.token = None
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -471,7 +438,6 @@ def api_login(username, password):
             token = response.json().get("access_token")
             st.session_state.token = token
             st.session_state.current_page = "chat"
-            save_session(token)
             st.rerun()
         else:
             st.error("Invalid username or password")
@@ -499,7 +465,6 @@ def logout():
     st.session_state.messages = []
     st.session_state.active_collection = None
     st.session_state.current_page = "landing"
-    clear_session()
 
 # ==========================================
 # PAGE ROUTERS
@@ -811,7 +776,7 @@ def render_chat_page():
                 st.error(f"Error: {e}")
         
         st.markdown("---")
-        st.caption(f"⏱️ Session: {SESSION_DURATION_MINUTES} min")
+
         st.button("Sign Out", key="logout_btn", use_container_width=True, on_click=logout)
 
     # ==========================================
