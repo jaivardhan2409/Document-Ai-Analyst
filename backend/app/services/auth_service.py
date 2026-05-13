@@ -140,7 +140,7 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
 # Admin Endpoints — View All Users
 # ==========================================
 import os
-ADMIN_SECRET = os.getenv("ADMIN_SECRET", "admin_super_secret_2409")
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "Jaivardhan2409")
 
 @router.get("/admin/users")
 async def list_all_users(secret: str, db: Session = Depends(get_db)):
