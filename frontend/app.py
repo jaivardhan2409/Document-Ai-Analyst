@@ -919,35 +919,17 @@ def render_admin_page(admin_secret):
             """, unsafe_allow_html=True)
 
             if users:
-                # Build an HTML table for clean display
-                rows = ""
-                for i, u in enumerate(users, 1):
-                    rows += f"""
-                    <tr>
-                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">{i}</td>
-                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 500;">{u['username']}</td>
-                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted);">{u['email']}</td>
-                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">{u['id'][:12]}...</td>
-                    </tr>
-                    """
-
-                st.markdown(f"""
-                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: var(--bg-main);">
-                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">#</th>
-                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Username</th>
-                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Email</th>
-                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">User ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rows}
-                        </tbody>
-                    </table>
-                </div>
-                """, unsafe_allow_html=True)
+                import pandas as pd
+                df = pd.DataFrame([
+                    {
+                        "#": i,
+                        "Username": u["username"],
+                        "Email": u["email"],
+                        "User ID": u["id"][:12] + "..."
+                    }
+                    for i, u in enumerate(users, 1)
+                ])
+                st.dataframe(df, use_container_width=True, hide_index=True)
             else:
                 st.info("No users registered yet.")
 
