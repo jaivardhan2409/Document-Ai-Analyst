@@ -886,9 +886,88 @@ def render_chat_page():
                 st.session_state.messages.append({"role": "assistant", "content": f"Error: {e}"})
 
 # ==========================================
+# ADMIN PAGE — View All Registered Users
+# ==========================================
+def render_admin_page(admin_secret):
+    """Admin dashboard to view all registered users."""
+    st.markdown("""<style>[data-testid="stSidebar"] {display: none;}</style>""", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="text-align: center; margin: 2rem 0;">
+        <h1 style="font-size: 2rem;">🔐 Admin Dashboard</h1>
+        <p style="color: var(--text-muted);">View all registered accounts</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/auth/admin/users",
+            params={"secret": admin_secret},
+            timeout=15
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            total = data.get("total_users", 0)
+            users = data.get("users", [])
+
+            st.markdown(f"""
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--accent);">{total}</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">Total Registered Users</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if users:
+                # Build an HTML table for clean display
+                rows = ""
+                for i, u in enumerate(users, 1):
+                    rows += f"""
+                    <tr>
+                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border);">{i}</td>
+                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 500;">{u['username']}</td>
+                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted);">{u['email']}</td>
+                        <td style="padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">{u['id'][:12]}...</td>
+                    </tr>
+                    """
+
+                st.markdown(f"""
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--bg-main);">
+                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">#</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Username</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Email</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">User ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.info("No users registered yet.")
+
+        elif response.status_code == 403:
+            st.error("❌ Invalid admin secret.")
+        else:
+            st.error(f"❌ Backend error: {response.text}")
+
+    except Exception as e:
+        st.error(f"❌ Could not connect to backend: {e}")
+
+# ==========================================
 # APP ROUTER
 # ==========================================
-if st.session_state.current_page == "landing":
+
+# Check for admin access via URL query params: ?page=admin&secret=YOUR_SECRET
+query_params = st.query_params
+if query_params.get("page") == "admin" and query_params.get("secret"):
+    render_admin_page(query_params.get("secret"))
+elif st.session_state.current_page == "landing":
     render_landing_page()
 elif st.session_state.current_page == "login":
     render_login_page()
