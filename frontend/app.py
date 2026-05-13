@@ -2,10 +2,45 @@ import streamlit as st
 import requests
 import os
 import json
+import threading
+import time
 from datetime import datetime, timedelta
 
 # Backend URL Configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+
+# ==========================================
+# Keep-Alive Background Thread (HF Spaces)
+# ==========================================
+KEEP_ALIVE_INTERVAL = int(os.getenv("KEEP_ALIVE_INTERVAL", "240"))  # 4 minutes
+
+def _keep_alive_worker():
+    """Daemon thread that pings the frontend & backend periodically
+    to prevent Hugging Face Spaces from sleeping the container."""
+    time.sleep(60)  # Wait for services to fully start
+    while True:
+        try:
+            # Ping the backend health endpoint
+            requests.get(f"{BACKEND_URL}/health", timeout=10)
+        except Exception:
+            pass
+        try:
+            # Ping the frontend itself (Streamlit healthz endpoint)
+            frontend_url = os.getenv("SPACE_HOST", "")
+            if frontend_url:
+                url = f"https://{frontend_url}" if not frontend_url.startswith("http") else frontend_url
+                requests.get(url, timeout=10)
+            else:
+                requests.get("http://localhost:7860/_stcore/health", timeout=10)
+        except Exception:
+            pass
+        time.sleep(KEEP_ALIVE_INTERVAL)
+
+# Start keep-alive only once (Streamlit reruns the script on each interaction)
+if "keep_alive_started" not in st.session_state:
+    st.session_state.keep_alive_started = True
+    _thread = threading.Thread(target=_keep_alive_worker, daemon=True)
+    _thread.start()
 
 
 st.set_page_config(

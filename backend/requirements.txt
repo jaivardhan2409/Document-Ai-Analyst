@@ -15,3 +15,4 @@ langchain-text-splitters
 google-generativeai
 openai
 python-docx
+httpx
