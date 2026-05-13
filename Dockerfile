@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Create persistent data directory (HF Spaces mounts /data as persistent volume)
+RUN mkdir -p /data/chroma_db /data/uploads && chmod -R 777 /data
+
 # Copy all code into the container
 COPY . .
 

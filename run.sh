@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# ==========================================
+# Create persistent storage directories
+# HF Spaces provides /data as persistent volume
+# ==========================================
+PERSISTENT_DIR="${PERSISTENT_DIR:-/data}"
+echo "Setting up persistent storage at $PERSISTENT_DIR..."
+mkdir -p "$PERSISTENT_DIR/chroma_db"
+mkdir -p "$PERSISTENT_DIR/uploads"
+
 # Start the Backend (FastAPI) in the background
 echo "Starting Backend on port 8000..."
 export PYTHONPATH=$PYTHONPATH:/app/backend

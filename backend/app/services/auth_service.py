@@ -135,3 +135,44 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
             email=user.email
         )
     }
+
+# ==========================================
+# Admin Endpoints — View All Users
+# ==========================================
+import os
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "admin_super_secret_2409")
+
+@router.get("/admin/users")
+async def list_all_users(secret: str, db: Session = Depends(get_db)):
+    """List all registered users (admin only).
+    Usage: GET /api/auth/admin/users?secret=<ADMIN_SECRET>
+    """
+    if secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    
+    from app.models.database import User
+    users = db.query(User).all()
+    
+    return {
+        "total_users": len(users),
+        "users": [
+            {
+                "id": u.id,
+                "username": u.username,
+                "email": u.email,
+            }
+            for u in users
+        ]
+    }
+
+@router.get("/admin/users/count")
+async def user_count(secret: str, db: Session = Depends(get_db)):
+    """Get total number of registered users (admin only).
+    Usage: GET /api/auth/admin/users/count?secret=<ADMIN_SECRET>
+    """
+    if secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    
+    from app.models.database import User
+    count = db.query(User).count()
+    return {"total_users": count}
